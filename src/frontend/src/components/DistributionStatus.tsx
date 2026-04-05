@@ -7,7 +7,7 @@ import { CheckCircle2, Circle, Clock, Send, XCircle } from "lucide-react";
 function StatusIcon({ status }: { status: PlatformStatus }) {
   switch (status) {
     case "live":
-      return <CheckCircle2 className="h-4 w-4 text-success" />;
+      return <CheckCircle2 className="h-4 w-4 text-green-400" />;
     case "pending":
       return <Clock className="h-4 w-4 text-yellow-400" />;
     case "rejected":
@@ -19,7 +19,7 @@ function StatusIcon({ status }: { status: PlatformStatus }) {
 
 function StatusBadge({ status }: { status: PlatformStatus }) {
   const classes: Record<PlatformStatus, string> = {
-    live: "border-success/50 text-success bg-success/10",
+    live: "border-green-400/50 text-green-400 bg-green-400/10",
     pending: "border-yellow-400/50 text-yellow-400 bg-yellow-400/10",
     rejected: "border-destructive/50 text-destructive bg-destructive/10",
     not_submitted: "border-border text-muted-foreground",

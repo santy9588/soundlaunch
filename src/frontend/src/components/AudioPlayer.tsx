@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import type { Track } from "@/types/track";
 import {
+  Download,
   Music,
   Pause,
   Play,
@@ -85,6 +86,17 @@ export function AudioPlayer({ track, onClose }: AudioPlayerProps) {
 
   const skip = (seconds: number) => {
     setCurrentTime((prev) => Math.max(0, Math.min(duration, prev + seconds)));
+  };
+
+  const handleDownload = () => {
+    if (track.audioUrl) {
+      const a = document.createElement("a");
+      a.href = track.audioUrl;
+      a.download = `${track.title} - ${track.artist}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
   };
 
   const progressPercent = duration > 0 ? currentTime / duration : 0;
@@ -236,6 +248,19 @@ export function AudioPlayer({ track, onClose }: AudioPlayerProps) {
             }}
           />
         </div>
+
+        {/* Download */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 flex-shrink-0"
+          onClick={handleDownload}
+          title={track.audioUrl ? "Download audio" : "No audio file available"}
+          disabled={!track.audioUrl}
+        >
+          <Download className="h-4 w-4" />
+        </Button>
 
         <Button
           type="button"

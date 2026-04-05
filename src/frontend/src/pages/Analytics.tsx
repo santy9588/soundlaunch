@@ -1,7 +1,8 @@
 import { StatCard } from "@/components/StatCard";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { Track } from "@/types/track";
-import { Music } from "lucide-react";
+import { Download, Music } from "lucide-react";
 
 interface AnalyticsProps {
   tracks: Track[];
@@ -12,6 +13,17 @@ function generateTrendData(base: number): number[] {
     const noise = (Math.random() - 0.4) * base * 0.2;
     return Math.max(0, Math.round(base * (0.6 + (i / 9) * 0.4) + noise));
   });
+}
+
+function handleDownload(track: Track) {
+  if (track.audioUrl) {
+    const a = document.createElement("a");
+    a.href = track.audioUrl;
+    a.download = `${track.title} - ${track.artist}.mp3`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
 }
 
 export function Analytics({ tracks }: AnalyticsProps) {
@@ -94,6 +106,7 @@ export function Analytics({ tracks }: AnalyticsProps) {
                 <th className="text-right px-4 py-3 text-xs text-muted-foreground font-medium">
                   Genre
                 </th>
+                <th className="text-right px-4 py-3 text-xs text-muted-foreground font-medium" />
               </tr>
             </thead>
             <tbody>
@@ -146,6 +159,22 @@ export function Analytics({ tracks }: AnalyticsProps) {
                       >
                         {track.genre}
                       </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => handleDownload(track)}
+                        disabled={!track.audioUrl}
+                        title={
+                          track.audioUrl
+                            ? "Download audio"
+                            : "No file available"
+                        }
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                      </Button>
                     </td>
                   </tr>
                 ))}

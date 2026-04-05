@@ -1,13 +1,16 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Track } from "@/types/track";
 import {
+  Download,
   MoreHorizontal,
   Music,
   Pencil,
@@ -22,12 +25,26 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+export function handleDownload(track: Track) {
+  if (track.audioUrl) {
+    const a = document.createElement("a");
+    a.href = track.audioUrl;
+    a.download = `${track.title} - ${track.artist}.mp3`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+}
+
 interface TrackCardProps {
   track: Track;
   onPlay: (track: Track) => void;
   onEdit?: (track: Track) => void;
   onDelete?: (track: Track) => void;
   showStats?: boolean;
+  selected?: boolean;
+  onSelectToggle?: (id: string) => void;
+  index?: number;
 }
 
 export function TrackCard({
@@ -36,13 +53,37 @@ export function TrackCard({
   onEdit,
   onDelete,
   showStats = false,
+  selected = false,
+  onSelectToggle,
+  index,
 }: TrackCardProps) {
   const liveCount = Object.values(track.distribution).filter(
     (v) => v === "live",
   ).length;
 
+  const ocidSuffix = index !== undefined ? `.${index}` : "";
+
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-card hover:bg-muted/30 transition-colors group">
+    <div
+      className={`flex items-center gap-3 p-3 rounded-xl transition-colors group ${
+        selected
+          ? "bg-primary/10 ring-1 ring-primary/30"
+          : "bg-card hover:bg-muted/30"
+      }`}
+    >
+      {/* Checkbox */}
+      {onSelectToggle && (
+        <div className="flex-shrink-0 flex items-center">
+          <Checkbox
+            checked={selected}
+            onCheckedChange={() => onSelectToggle(track.id)}
+            aria-label={`Select ${track.title}`}
+            data-ocid={`releases.checkbox${ocidSuffix}`}
+            className="border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+          />
+        </div>
+      )}
+
       {/* Cover */}
       <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden">
         {track.coverUrl ? (
@@ -107,9 +148,22 @@ export function TrackCard({
           className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
           onClick={() => onPlay(track)}
           title="Play"
+          data-ocid={`releases.item${ocidSuffix}`}
         >
           <Play className="h-4 w-4" />
         </Button>
+        {track.audioUrl && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() => handleDownload(track)}
+            title="Download"
+            data-ocid={`releases.delete_button${ocidSuffix}`}
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -120,21 +174,33 @@ export function TrackCard({
             <DropdownMenuItem onClick={() => onPlay(track)}>
               <Play className="mr-2 h-4 w-4" /> Play
             </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleDownload(track)}
+              disabled={!track.audioUrl}
+            >
+              <Download className="mr-2 h-4 w-4" /> Download Audio
+            </DropdownMenuItem>
             {onEdit && (
-              <DropdownMenuItem onClick={() => onEdit(track)}>
-                <Pencil className="mr-2 h-4 w-4" /> Edit Metadata
-              </DropdownMenuItem>
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => onEdit(track)}>
+                  <Pencil className="mr-2 h-4 w-4" /> Edit Metadata
+                </DropdownMenuItem>
+              </>
             )}
             <DropdownMenuItem>
               <Share2 className="mr-2 h-4 w-4" /> Distribute
             </DropdownMenuItem>
             {onDelete && (
-              <DropdownMenuItem
-                onClick={() => onDelete(track)}
-                className="text-destructive"
-              >
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
-              </DropdownMenuItem>
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => onDelete(track)}
+                  className="text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" /> Delete
+                </DropdownMenuItem>
+              </>
             )}
           </DropdownMenuContent>
         </DropdownMenu>

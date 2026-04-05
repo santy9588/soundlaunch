@@ -15,7 +15,12 @@ import {
   CreditCard,
   DollarSign,
   Music,
+  QrCode,
+  ShoppingBag,
+  Smartphone,
   TrendingUp,
+  Wallet,
+  Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
@@ -38,6 +43,66 @@ const ROYALTY_RATES = [
   { platform: "Boomplay", perThousand: "$1.40", estimated: "Based on plays" },
 ];
 
+interface PaymentGateway {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  iconBg: string;
+  badge: string;
+}
+
+const PAYMENT_GATEWAYS: PaymentGateway[] = [
+  {
+    id: "razorpay",
+    name: "Razorpay",
+    description: "Indian payments — UPI, netbanking, wallets & cards",
+    icon: <Zap className="w-4 h-4 text-blue-400" />,
+    iconBg: "bg-blue-600/20",
+    badge: "Available",
+  },
+  {
+    id: "paypal",
+    name: "PayPal",
+    description: "International payments — 200+ countries supported",
+    icon: <Wallet className="w-4 h-4 text-sky-400" />,
+    iconBg: "bg-sky-600/20",
+    badge: "Available",
+  },
+  {
+    id: "paytm",
+    name: "Paytm",
+    description: "India's leading wallet — UPI & Paytm Pay",
+    icon: <Smartphone className="w-4 h-4 text-indigo-400" />,
+    iconBg: "bg-indigo-600/20",
+    badge: "Available",
+  },
+  {
+    id: "phonepe",
+    name: "PhonePe",
+    description: "Fast UPI transfers — India's top payment app",
+    icon: <Smartphone className="w-4 h-4 text-purple-400" />,
+    iconBg: "bg-purple-600/20",
+    badge: "Available",
+  },
+  {
+    id: "upi",
+    name: "UPI",
+    description: "QR code payments & UPI ID — instant bank transfers",
+    icon: <QrCode className="w-4 h-4 text-green-400" />,
+    iconBg: "bg-green-600/20",
+    badge: "Available",
+  },
+  {
+    id: "amazonpay",
+    name: "Amazon Pay",
+    description: "Amazon wallet — trusted by millions of Prime users",
+    icon: <ShoppingBag className="w-4 h-4 text-orange-400" />,
+    iconBg: "bg-orange-600/20",
+    badge: "Available",
+  },
+];
+
 export function Earn({ tracks }: EarnProps) {
   const totalEarnings = tracks.reduce((s, t) => s + t.earnings, 0);
   const sortedTracks = [...tracks].sort((a, b) => b.earnings - a.earnings);
@@ -48,6 +113,13 @@ export function Earn({ tracks }: EarnProps) {
       {
         duration: 5000,
       },
+    );
+  };
+
+  const handleConnectGateway = (name: string) => {
+    toast.info(
+      `Connect your ${name} account in Admin settings to enable payouts.`,
+      { duration: 4000 },
     );
   };
 
@@ -236,7 +308,8 @@ export function Earn({ tracks }: EarnProps) {
               Connected Payment Methods
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
+            {/* Stripe — configured */}
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-emerald-600/20">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-violet-600/20 flex items-center justify-center">
@@ -256,26 +329,49 @@ export function Earn({ tracks }: EarnProps) {
                 Configured
               </Badge>
             </div>
-            <div className="p-4 rounded-lg bg-muted/20 border border-border">
-              <p className="text-xs font-semibold text-foreground mb-1">
-                Additional Payment Providers Available
+
+            {/* Available gateways section */}
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                Available Payment Providers
               </p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="text-foreground">
-                  Razorpay, PayPal, Paytm, PhonePe, UPI, Amazon Pay
-                </span>
-                {
-                  " — contact support to connect these providers to your account for payouts in your region."
-                }
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-3 text-xs border-primary/30 text-primary hover:bg-primary/10"
-                data-ocid="earn.support.secondary_button"
-              >
-                Contact Support
-              </Button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {PAYMENT_GATEWAYS.map((gw, i) => (
+                  <motion.div
+                    key={gw.id}
+                    initial={{ opacity: 0, scale: 0.97 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.25, delay: 0.3 + i * 0.05 }}
+                    className="flex items-center justify-between p-3 rounded-lg bg-muted/20 border border-border hover:border-primary/30 hover:bg-muted/30 transition-all"
+                    data-ocid={`earn.gateway.card.${i + 1}`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${gw.iconBg}`}
+                      >
+                        {gw.icon}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground">
+                          {gw.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate max-w-[160px]">
+                          {gw.description}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="ml-2 text-xs border-primary/40 text-primary hover:bg-primary/10 hover:border-primary shrink-0 font-medium"
+                      onClick={() => handleConnectGateway(gw.name)}
+                      data-ocid={`earn.gateway.button.${i + 1}`}
+                    >
+                      Connect
+                    </Button>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
