@@ -10,24 +10,18 @@ export default {
     container: {
       center: true,
       padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
+      screens: { "2xl": "1400px" },
     },
     extend: {
       fontFamily: {
-        display: ["Bricolage Grotesque", "sans-serif"],
-        body: ["Outfit", "sans-serif"],
+        sans: ["Plus Jakarta Sans", "sans-serif"],
+        display: ["Bricolage Grotesque", "Plus Jakarta Sans", "sans-serif"],
         mono: ["Geist Mono", "monospace"],
       },
       colors: {
         success: {
           DEFAULT: "oklch(var(--success))",
           foreground: "oklch(var(--success-foreground))",
-        },
-        warning: {
-          DEFAULT: "oklch(var(--warning))",
-          foreground: "oklch(var(--warning-foreground))",
         },
         border: "oklch(var(--border))",
         input: "oklch(var(--input))",
@@ -70,23 +64,20 @@ export default {
           5: "oklch(var(--chart-5))",
         },
         sidebar: {
-          DEFAULT: "oklch(var(--sidebar))",
-          foreground: "oklch(var(--sidebar-foreground))",
-          primary: "oklch(var(--sidebar-primary))",
-          "primary-foreground": "oklch(var(--sidebar-primary-foreground))",
-          accent: "oklch(var(--sidebar-accent))",
-          "accent-foreground": "oklch(var(--sidebar-accent-foreground))",
-          border: "oklch(var(--sidebar-border))",
-          ring: "oklch(var(--sidebar-ring))",
+          DEFAULT: "oklch(var(--sidebar, var(--card)))",
+          foreground: "oklch(var(--sidebar-foreground, var(--card-foreground)))",
+          primary: "oklch(var(--sidebar-primary, var(--primary)))",
+          "primary-foreground": "oklch(var(--sidebar-primary-foreground, var(--primary-foreground)))",
+          accent: "oklch(var(--sidebar-accent, var(--accent)))",
+          "accent-foreground": "oklch(var(--sidebar-accent-foreground, var(--accent-foreground)))",
+          border: "oklch(var(--sidebar-border, var(--border)))",
+          ring: "oklch(var(--sidebar-ring, var(--ring)))",
         },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-      },
-      boxShadow: {
-        xs: "0 1px 2px 0 rgba(0,0,0,0.05)",
       },
       keyframes: {
         "accordion-down": {
